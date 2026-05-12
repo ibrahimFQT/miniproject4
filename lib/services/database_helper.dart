@@ -1,6 +1,6 @@
+import 'package:noteapp/models/note_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:note_apk/models/note_models.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -26,7 +26,7 @@ class DatabaseHelper {
     );
   }
 
-  Future _createDB(Database db, int version) async {
+  Future<void> _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE notes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +50,7 @@ class DatabaseHelper {
   }
 
   // ✅ GET
-  Future<List<Note>> getNotes() async {
+  Future<List<Object?>> getNotes() async {
     final db = await instance.database;
 
     final result = await db.query(
@@ -59,7 +59,7 @@ class DatabaseHelper {
     );
 
     return result
-        .map((json) => Note.fromMap(json))
+        .map((json) => Note.fromMap(Map<String, dynamic>.from(json)))
         .toList();
   }
 
@@ -86,8 +86,8 @@ class DatabaseHelper {
     );
   }
 
-  Future close() async {
+  Future<void> close() async {
     final db = await instance.database;
-    db.close();
+    await db.close();
   }
 }

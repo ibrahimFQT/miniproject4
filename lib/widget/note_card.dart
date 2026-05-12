@@ -1,105 +1,79 @@
 import 'package:flutter/material.dart';
-import '../../models/note_model.dart';
+import '../models/note_model.dart';
 
-class NoteCard extends StatefulWidget {
-  final Note? note;
-  const NoteCard({super.key, this.note, required void Function() onEdit, required void Function() onDelete});
-  @override
-  State<NoteCard> createState() => _NoteCardState();
-}
+class NoteCard extends StatelessWidget {
+  final Note note;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-class _NoteCardState extends State<NoteCard> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
-  final TextEditingController authorController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.note != null) {
-      titleController.text = widget.note!.title;
-      contentController.text = widget.note!.content;
-      authorController.text = widget.note!.author;
-    }
-  }
-
-  void saveNote() {
-    final note = Note(
-      title: titleController.text,
-      content: contentController.text,
-      author: authorController.text,
-    );
-    Navigator.pop(context, note);
-  }
-
-  void deleteNote() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete Note'),
-        content: Text('Are you sure you want to delete this note?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      Navigator.pop(context, "delete");
-    }
-  }
+  const NoteCard({
+    super.key,
+    required this.note,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: saveNote),
-        actions: [IconButton(onPressed: deleteNote, icon: Icon(Icons.delete))],
-      ),
-      body: Padding(
-        padding: EdgeInsetsGeometry.all(16),
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: onEdit,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: titleController,
-              style: Theme.of(context).textTheme.titleLarge,
-              decoration: const InputDecoration(
-                hint: Text("judul"),
-                border: InputBorder.none,
-              ),
+            // TITLE
+            Text(
+              note.title,
+              style: theme.textTheme.titleLarge,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 12),
+
+            const SizedBox(height: 6),
+
+            // CONTENT
             Expanded(
-              child: TextField(
-                controller: contentController,
-                style: Theme.of(context).textTheme.bodyMedium,
-                maxLines: null,
-                expands: true,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hint: Text("isi"),
-                ),
+              child: Text(
+                note.content,
+                style: theme.textTheme.bodyMedium,
+                maxLines: 6,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
 
-            Divider(color: Theme.of(context).colorScheme.primary),
-            SizedBox(height: 12),
-            TextField(
-              controller: authorController,
-              style: Theme.of(context).textTheme.bodyMedium,
-              decoration: const InputDecoration(
-                hint: Text("ditulis oleh"),
-                border: InputBorder.none,
-              ),
+            const SizedBox(height: 8),
+
+            // AUTHOR
+            Text(
+              note.author,
+              style: theme.textTheme.bodySmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+
+            const SizedBox(height: 6),
+
+            // ACTION opsional
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: onDelete,
+                  child: Icon(
+                    Icons.delete,
+                    size: 18,
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

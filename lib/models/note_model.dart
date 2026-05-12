@@ -1,38 +1,25 @@
 class Note {
-  int? id;
   String title;
   String content;
   String author;
-  String createdAt;
-  String updatedAt;
 
-  Note({
-    this.id,
-    required this.title,
-    required this.content,
-    required this.author,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  Note({required this.title, required this.content, required this.author});
 
-  Map<String, dynamic> toMap() {
+  get id => null;
+
+  static Object? fromMap(Map<String, dynamic> map) {
+    return Note(
+      title: map['title'] as String,
+      content: map['content'] as String,
+      author: map['author'] as String,
+    );
+  }
+
+  Map<String, Object?> toMap() {
     return {
-      'id': id,
       'title': title,
       'content': content,
       'author': author,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
     };
   }
-
-  factory Note.fromMap(Map<String, dynamic> map) {
-    return Note(
-      id: map['id'],
-      title: map['title'],
-      content: map['content'],
-      author: map['author'],
-      createdAt: map['createdAt'],
-      updatedAt: map['updatedAt'],
-    );
-  }
+}
